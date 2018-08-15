@@ -27,33 +27,43 @@ package ProjectEuler;
  * <h2>Notes:</h2>
  * It seems like we have only two facts we can use to speed this problem up.<br>
  * First, the Nth triangular number is given by Tri(N) = N(N+1) / 2.<br>
- * Second, if N has k non-distinct prime factors with multiplicities m1,m2,...,mk, then N has 2^k / (m1!m2!...mk!)
+ * Second, if N has k distinct prime factors with multiplicities m1,m2,...,mk, then N has (m1+1)(m2+1)...(mk+1)
  * unique factors.
  * <p>
- * From this second fact, we can ascertain that the number we're looking for must have at least 9 prime factors and must
- * be at least as large as 2*3*5*7*11*13*17*19*23 = 223,092,870.<br>
- * Plugging this into the triangular number formula and solving for N, we find that N > 21,122.
- * <p>
- * Here, we need to make a choice:<br>
- * Finding the number of factors for a given Tri(N) will be much faster if we have a table of primes to check against
- * instead of checking every number less than Tri(N) / 2. However, we need to generate this table, effectively
- * losing the time we could save by starting from N = 21,123.
+ * From the above, the number of factors in N(N+1) is (# of factors of N)(# of factors of N+1). Thus, the number of
+ * factors in T(N) is ((# of factors of N) - 1)(# of factors of N+1) to account for the division by two, assuming that N
+ * is the even factor. The formula if N is odd is obvious.
  * 
  * <p>
  *
  * @author Stephen Broughton
- * @since Aug 5, 2018
+ * @since Aug 12, 2018
  */
 public class Problem012 {
 
     public static void main(String[] args) {
-        for (long i = 21123; true; i++) {
-            int count = 0;
-            long num = (i * (i + 1)) / 2;
-            for (long j = 1; j < num / 2; j++)
-                if (num % j == 0) count++;
-            System.out.println(num);
-            if (count + 1 > 500) break;
+        long n = 2;
+        boolean even = true;
+        int nFactors = 1;
+        for (; true; n++) {
+            int nPlusOneFactors = factor(n + 1);
+            if (nFactors * nPlusOneFactors > 500) break;
+            nFactors = nPlusOneFactors;
+            even = !even;
         }
+        System.out.println(n * (n + 1) / 2);
+    }
+
+    public static int factor(long n) {
+        int count = 1;
+        int exp = (n % 2 == 0) ? -1 : 0;  // If n is even, we reduce the exponent on the 2 factor by 1 to account for
+                                          // dividing by 2 in the triangular number formula.
+        for (long i = 2; i <= n; i++) {
+            for (; n % i == 0; n /= i)
+                exp++;
+            if (exp != 0) count *= ++exp;
+            exp = 0;
+        }
+        return count;
     }
 }
