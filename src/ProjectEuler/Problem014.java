@@ -41,7 +41,7 @@ public class Problem014 {
                 longestCount = count;
             }
         }
-        System.out.println(longestStart + " " + longestCount);
+        System.out.println(longestStart);
     }
 
     public static long collatz(long n) {
